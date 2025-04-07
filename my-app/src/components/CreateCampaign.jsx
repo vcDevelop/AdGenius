@@ -18,9 +18,9 @@ const CreateCampaign = () => {
   const [error, setError] = useState(null);
 
   // Hugging Face API key (in production, store this securely)
-  const HF_API_KEY = "Hugging face api key";
+  const HF_API_KEY = "Your key";
   const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3";
-  const HF_API_URL = https://api-inference.huggingface.co/models/${MODEL_NAME};
+  const HF_API_URL = `https://api-inference.huggingface.co/models/${MODEL_NAME}`;
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -43,11 +43,11 @@ const CreateCampaign = () => {
       const response = await fetch(HF_API_URL, {
         method: 'POST',
         headers: {
-          'Authorization': Bearer ${HF_API_KEY},
+          'Authorization': `Bearer ${HF_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: Generate a detailed ad description about: ${prompt}. The first line should be a catchy title.,
+          inputs: `Generate a detailed ad description about: ${prompt}. The first line should be a catchy title.`,
           parameters: {
             max_length: 300,
             temperature: 0.7,
