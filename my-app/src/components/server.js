@@ -18,25 +18,43 @@ app.post("/generate-image", async (req, res) => {
   try {
     // Determine the API endpoint based on the model
     const apiUrl = req.body.model === "classic_fast" ? IMAGEN3_API_URL : MYSTIC_API_URL;
-    console.log(`Calling API: ${apiUrl}`);
+    
+    // Handle model validation and defaults
+    let model = req.body.model;
+    
+    if (apiUrl === MYSTIC_API_URL) {
+      const validMysticModels = ['fluid', 'realism', 'zen'];
+      
+      // If model is invalid, default to 'realism'
+      if (!validMysticModels.includes(model)) {
+        model = 'realism';
+        console.log(`Invalid model provided, defaulting to: ${model}`);
+      }
+    }
+    
+    console.log(`Calling API: ${apiUrl} with model: ${model}`);
+    
+    // Create the request payload with the validated/default model
+    const payload = {
+      ...req.body,
+      model: model  // Use the validated/default model
+    };
     
     // Send the request to Freepik API to generate image
-    const response = await axios.post(apiUrl, req.body, {
+    const response = await axios.post(apiUrl, payload, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "x-freepik-api-key": API_KEY,  // Include Freepik API key
+        "x-freepik-api-key": API_KEY,
       },
     });
 
-    // Return the data from the Freepik API
     res.json(response.data);
   } catch (error) {
-    // Log and return the error details
     console.error("Error details:", error.response ? error.response.data : error.message);
     res.status(500).json({ error: error.response ? error.response.data : error.message });
   }
-});
+});    
 
 // Route to check image status
 app.get("/check-status/:taskId", async (req, res) => {

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import Select from "react-select";
+import Modal from "react-modal";
+
+// Make sure to bind modal to your appElement (for accessibility reasons)
+Modal.setAppElement('#root');
 
 const adPlatforms = [
   { value: "google", label: "Google Ads" },
@@ -22,20 +26,83 @@ const audienceOptions = [
   { value: "gaming", label: "Gamers" },
 ];
 
+const subscriptionPlans = [
+  {
+    id: 1,
+    name: "Starter",
+    price: "$9.99/month",
+    features: [
+      "5 ads per month",
+      "Basic analytics",
+      "Email support"
+    ],
+    recommended: false
+  },
+  {
+    id: 2,
+    name: "Professional",
+    price: "$29.99/month",
+    features: [
+      "20 ads per month",
+      "Advanced analytics",
+      "Priority support",
+      "A/B testing"
+    ],
+    recommended: true
+  },
+  {
+    id: 3,
+    name: "Enterprise",
+    price: "$99.99/month",
+    features: [
+      "Unlimited ads",
+      "Premium analytics",
+      "24/7 support",
+      "Dedicated account manager",
+      "Custom integrations"
+    ],
+    recommended: false
+  }
+];
+
 const AdDistribution = () => {
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [targetAudience, setTargetAudience] = useState([]);
   const [budget, setBudget] = useState();
   const [duration, setDuration] = useState();
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Show subscription modal instead of directly submitting
+    setShowSubscriptionModal(true);
+  };
+
+  const handlePlanSelect = (plan) => {
+    setSelectedPlan(plan);
+  };
+
+  const handlePurchase = () => {
+    if (!selectedPlan) {
+      alert("Please select a subscription plan");
+      return;
+    }
+    
+    // Here you would typically integrate with a payment processor
+    console.log("Purchased plan:", selectedPlan);
+    
+    // After successful purchase, submit the ad
     console.log("Ad Submitted:", {
       selectedPlatform,
       targetAudience,
       budget,
       duration,
     });
+    
+    // Close the modal
+    setShowSubscriptionModal(false);
+    alert(`Thank you for purchasing ${selectedPlan.name} plan! Your ad has been submitted.`);
   };
 
   return (
@@ -89,6 +156,94 @@ const AdDistribution = () => {
           Submit Ad
         </button>
       </form>
+
+      {/* Subscription Modal */}
+      <Modal
+        isOpen={showSubscriptionModal}
+        onRequestClose={() => setShowSubscriptionModal(false)}
+        contentLabel="Subscription Required"
+        className="modal"
+        overlayClassName="overlay"
+      >
+        <div className="bg-white p-6 rounded-lg max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Choose Your Subscription Plan</h2>
+          <p className="text-gray-600 mb-6">To distribute your ads, please select a subscription plan:</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {subscriptionPlans.map(plan => (
+              <div 
+                key={plan.id} 
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${selectedPlan?.id === plan.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'} ${plan.recommended ? 'ring-2 ring-blue-500' : ''}`}
+                onClick={() => handlePlanSelect(plan)}
+              >
+                {plan.recommended && (
+                  <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full mb-2 inline-block">
+                    RECOMMENDED
+                  </span>
+                )}
+                <h3 className="text-xl font-bold text-gray-800">{plan.name}</h3>
+                <p className="text-lg font-semibold text-blue-600 my-2">{plan.price}</p>
+                <ul className="text-gray-600 space-y-1">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start">
+                      <svg className="w-4 h-4 mt-1 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          
+          <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => setShowSubscriptionModal(false)}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handlePurchase}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+              disabled={!selectedPlan}
+            >
+              Purchase & Submit Ad
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Add these styles to your CSS file or style tag */}
+      <style jsx>{`
+        .modal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          right: auto;
+          bottom: auto;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          outline: none;
+          width: 90%;
+          max-width: 800px;
+          max-height: 90vh;
+          overflow-y: auto;
+        }
+        
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 1000;
+        }
+      `}</style>
     </div>
   );
 };
