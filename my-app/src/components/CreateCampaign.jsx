@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const CreateCampaign = () => {
+const CreateCampaign = ({ user }) => {
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -9,7 +9,8 @@ const CreateCampaign = () => {
     budget: '',
     media: null,
     category: 'Social Media',
-    duration: ''
+    duration: '',
+    status: 'draft'
   });
   
   // AI Generation state
@@ -17,6 +18,7 @@ const CreateCampaign = () => {
   const [isGeneratingText, setIsGeneratingText] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [progress, setProgress] = useState(10);
   const [aspectRatio, setAspectRatio] = useState("square_1_1");
@@ -24,12 +26,6 @@ const CreateCampaign = () => {
   const [model, setModel] = useState("default");
   const [style, setStyle] = useState("photo");
   const [activePreview, setActivePreview] = useState('banner');
-
-  // API keys and URLs
-  const HF_API_KEY = "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";
-  const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3";
-  const HF_API_URL = `https://api-inference.huggingface.co/models/${MODEL_NAME}`;
-  const IMAGE_API_URL = "http://localhost:5000";
 
   const styleOptions = [
     "photo", "digital-art", "3d", "painting", "low-poly", 
@@ -40,47 +36,25 @@ const CreateCampaign = () => {
   ];
 
   const adFormatPreviews = {
-    banner: {
-      name: 'Banner',
-      dimensions: '728x90',
-      className: 'w-full h-24 bg-white border border-gray-300 rounded'
-    },
-    sidebar: {
-      name: 'Sidebar',
-      dimensions: '300x250',
-      className: 'w-48 h-64 bg-white border border-gray-300 rounded'
-    },
-    header: {
-      name: 'Header',
-      dimensions: '970x90',
-      className: 'w-full h-20 bg-white border border-gray-300 rounded'
-    },
-    footer: {
-      name: 'Footer',
-      dimensions: '728x90',
-      className: 'w-full h-24 bg-white border border-gray-300 rounded'
-    },
-    inContent: {
-      name: 'In-Content',
-      dimensions: '300x250',
-      className: 'w-48 h-64 bg-white border border-gray-300 rounded'
-    },
-    popup: {
-      name: 'Popup',
-      dimensions: '400x400',
-      className: 'w-64 h-64 bg-white border border-gray-300 rounded'
-    },
-    interstitial: {
-      name: 'Interstitial',
-      dimensions: 'Full Screen',
-      className: 'w-full h-96 bg-white border border-gray-300 rounded'
-    }
+    banner: { name: 'Banner', dimensions: '728x90', className: 'w-full h-24 bg-white border border-gray-300 rounded' },
+    sidebar: { name: 'Sidebar', dimensions: '300x250', className: 'w-48 h-64 bg-white border border-gray-300 rounded' },
+    header: { name: 'Header', dimensions: '970x90', className: 'w-full h-20 bg-white border border-gray-300 rounded' },
+    footer: { name: 'Footer', dimensions: '728x90', className: 'w-full h-24 bg-white border border-gray-300 rounded' },
+    inContent: { name: 'In-Content', dimensions: '300x250', className: 'w-48 h-64 bg-white border border-gray-300 rounded' },
+    popup: { name: 'Popup', dimensions: '400x400', className: 'w-64 h-64 bg-white border border-gray-300 rounded' },
+    interstitial: { name: 'Interstitial', dimensions: 'Full Screen', className: 'w-full h-96 bg-white border border-gray-300 rounded' }
   };
+
+  const API_URL = "http://localhost:5000";
+  const HF_API_KEY = "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";
+  const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3";
+  const HF_API_URL = `https://api-inference.huggingface.co/models/${MODEL_NAME}`;
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData(prev => ({
       ...prev,
+      
       [name]: files ? files[0] : value
     }));
   };
@@ -112,20 +86,11 @@ const CreateCampaign = () => {
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate content');
-      }
-
+      if (!response.ok) throw new Error('Failed to generate content');
       const result = await response.json();
       const generatedText = result[0].generated_text;
-      
-      // Split the generated text into lines
       const lines = generatedText.split('\n').filter(line => line.trim());
-      
-      // First line is the title
       const title = lines[1].trim();
-      
-      // The rest is the description
       const description = lines.slice(2).join('\n').trim();
 
       setFormData(prev => ({
@@ -159,16 +124,13 @@ const CreateCampaign = () => {
         model
       };
 
-      // Add style only for classic_fast model
       if (model === "classic_fast") {
-        requestBody.styling = {
-          style: style
-        };
+        requestBody.styling = { style: style };
       } else {
         requestBody.realism = realism;
       }
 
-      const response = await fetch(`${IMAGE_API_URL}/generate-image`, {
+      const response = await fetch(`${API_URL}/generate-image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -197,7 +159,7 @@ const CreateCampaign = () => {
   };
 
   const checkStatus = async (taskId) => {
-    const statusUrl = `${IMAGE_API_URL}/check-status/${taskId}?model=${model}`;
+    const statusUrl = `${API_URL}/check-status/${taskId}?model=${model}`;
     let currentProgress = 10;
 
     const interval = setInterval(async () => {
@@ -229,15 +191,61 @@ const CreateCampaign = () => {
     }, 5000);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Campaign data:', {
-      ...formData,
-      generatedImage: imageUrl
-    });
-    alert('Campaign created successfully!');
+    setError(null);
+    setSuccess(null);
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication required");
+  
+      const campaignData = {
+        title: formData.title,
+        description: formData.description,
+        audience: formData.audience,
+        budget: parseFloat(formData.budget),
+        category: formData.category,
+        duration: parseInt(formData.duration),
+        status: formData.status,
+        generatedImage: imageUrl || null
+      };
+  
+      const response = await fetch(`${API_URL}/api/campaigns`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(campaignData)
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create campaign");
+      }
+  
+      const data = await response.json();
+      setSuccess("Campaign created successfully!");
+      
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        audience: '',
+        budget: '',
+        media: null,
+        category: 'Social Media',
+        duration: '',
+        status: 'draft'
+      });
+      setImageUrl(null);
+      setPrompt('');
+    } catch (err) {
+      setError(err.message || "An unknown error occurred");
+      console.error("Campaign creation error:", err);
+    }
   };
-
   const renderAdPreview = () => {
     const format = adFormatPreviews[activePreview];
     
@@ -484,15 +492,6 @@ const CreateCampaign = () => {
                       alt="Generated Visual Preview"
                       className="w-32 h-32 object-cover rounded mt-1 border border-gray-300"
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setFormData(prev => ({ ...prev, media: imageUrl }));
-                      }}
-                      className="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                    >
-                      Use This Image
-                    </button>
                   </div>
                 )}
               </div>
@@ -524,14 +523,31 @@ const CreateCampaign = () => {
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="block text-gray-900 font-medium">Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
             </div>
           </div>
           
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {success && <p className="text-green-500 text-sm">{success}</p>}
+
           <button
             type="submit"
             className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
-                      transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 mt-6"
-          >
+                      transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 mt-6">
             Create Campaign
           </button>
         </form>
