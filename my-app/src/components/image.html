@@ -1,0 +1,166 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #progressContainer {
+      display: none;
+      margin-top: 20px;
+    }
+    #imageContainer {
+      margin-top: 20px;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    a {
+      display: block;
+      margin-top: 10px;
+      font-size: 16px;
+      color: blue;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Generate AI Image</h1>
+  
+  <label for="prompt">Enter Prompt:</label>
+  <input type="text" id="prompt" placeholder="Enter your prompt here" required>
+
+  <label for="aspect_ratio">Choose Aspect Ratio:</label>
+  <select id="aspect_ratio">
+    <option value="square_1_1">Square 1:1</option>
+    <option value="classic_4_3">Classic 4:3</option>
+    <option value="traditional_3_4">Traditional 3:4</option>
+    <option value="widescreen_16_9">Widescreen 16:9</option>
+    <option value="social_story_9_16">Social Story 9:16</option>
+    <option value="smartphone_horizontal_20_9">Smartphone Horizontal 20:9</option>
+    <option value="smartphone_vertical_9_20">Smartphone Vertical 9:20</option>
+    <option value="standard_3_2">Standard 3:2</option>
+    <option value="portrait_2_3">Portrait 2:3</option>
+    <option value="horizontal_2_1">Horizontal 2:1</option>
+    <option value="vertical_1_2">Vertical 1:2</option>
+    <option value="social_5_4">Social 5:4</option>
+    <option value="social_post_4_5">Social Post 4:5</option>
+  </select>
+
+  <button id="generateBtn">Generate Image</button>
+
+  <div id="progressContainer">
+    <p>Generating image... Please wait.</p>
+    <progress id="progress" value="0" max="100" style="width:100%;"></progress>
+  </div>
+
+  <div id="imageContainer"></div>
+
+  <script>
+    document.getElementById('generateBtn').addEventListener('click', function() {
+      const prompt = document.getElementById('prompt').value;
+      const aspectRatio = document.getElementById('aspect_ratio').value;
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progress');
+      
+      if (!prompt) {
+        alert('Please enter a prompt.');
+        return;
+      }
+
+      progressContainer.style.display = 'block';
+      progressBar.value = 0;
+
+      fetch('https://api.freepik.com/v1/ai/mystic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'x-freepik-api-key': 'FPSXa21857cd43a64e2db3d839ef0d588874'  // Replace with your actual API key
+        },
+        body: JSON.stringify({ prompt: prompt, aspect_ratio: aspectRatio })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const taskId = data.data.task_id;
+        checkStatus(taskId);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong.');
+      });
+    });
+
+    function checkStatus(taskId) {
+      const statusUrl = `https://api.freepik.com/v1/ai/mystic/${taskId}`;
+      const progressBar = document.getElementById('progress');
+      let progress = 10;
+
+      const checkInterval = setInterval(() => {
+        fetch(statusUrl, {
+          headers: {
+            'x-freepik-api-key': 'FPSXa21857cd43a64e2db3d839ef0d588874'  // Replace with your actual API key
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          const status = data.data.status;
+
+          if (status === 'COMPLETED') {
+            clearInterval(checkInterval);
+            const imageUrl = data.data.generated;
+            displayImage(imageUrl);
+          } else if (status === 'FAILED') {
+            clearInterval(checkInterval);
+            alert('Image generation failed.');
+            document.getElementById('progressContainer').style.display = 'none';
+          } else {
+            progress = Math.min(progress + 15, 95); // Simulate progress
+            progressBar.value = progress;
+          }
+        })
+        .catch(error => {
+          console.error('Error checking status:', error);
+        });
+      }, 5000); // Check every 5 seconds
+    }
+
+    function displayImage(imageUrl) {
+      console.log("Generated Image URL:", imageUrl); 
+
+      const imageContainer = document.getElementById('imageContainer');
+      imageContainer.innerHTML = ''; 
+
+      
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.alt = 'Generated Image';
+      img.style.maxWidth = '100%';
+      img.style.marginTop = '10px';
+
+      
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.textContent = "View Image";
+      link.target = "_blank";
+      link.style.display = "block";
+      link.style.marginTop = "10px";
+
+      imageContainer.appendChild(img);
+      imageContainer.appendChild(link);
+
+      document.getElementById('progressContainer').style.display = 'none'; // Hide progress
+    }
+  </script>
+
+</body>
+</html> -->

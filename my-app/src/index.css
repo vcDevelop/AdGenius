@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+}
+
+/* 🚀 NAVBAR FIX */
+.navbar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 15px 20px;
+  min-height: 60px; /* Adjust dynamically */
+}
+
+/* 🚀 MAIN CONTENT FIX */
+.main-content {
+  padding: 20px;
+  padding-top: 80px; /* Ensure space below navbar */
+  min-height: calc(100vh - 80px); /* Prevent overflow */
+  padding-bottom: 60px; /* Add space at the bottom */
+}
+
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  margin-top: 20px;
+}
+
+a {
+  font-weight: 500;
+  color: #4d56fb;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #000000;
+}
+
+/* 🚀 BODY FIX */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  display: block;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* 🚀 CONTAINER FIX */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #858689;
+}
+
+/* 🚀 CHECKBOX FIX */
+input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #ccc;
+  background-color: white;
+  appearance: none;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #646cff;
+  border-color: #646cff;
+}
+
+input[type="checkbox"]:checked::before {
+  content: '✔';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.8em;
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid #646cff;
+}
+
+/* 🚀 MOBILE FIXES */
+@media screen and (max-width: 768px) {
+  .navbar {
+    min-height: 60px; /* Ensure navbar height adjusts */
+    padding: 10px 15px;
+  }
+
+  .main-content {
+    padding-top: 70px; /* Add more space for mobile */
+    padding-bottom: 60px; /* Avoid overlap at the bottom */
+  }
+
+  .container {
+    padding: 15px; /* Reduce padding for smaller screens */
+  }
+
+  h1 {
+    font-size: 2em; /* Reduce heading size */
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+
+  input[type="checkbox"] {
+    border-color: #aaa;
+    background-color: white;
+  }
+
+  input[type="checkbox"]:checked {
+    background-color: #535bf2;
+    border-color: #535bf2;
+  }
+}
+.container {
+  max-width: 600px;
+  margin: 80px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Dropdown */
+.dropdown {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Compare Button */
+.compare-button {
+  background: #007bff;
+  color: white;
+  padding: 12px 20px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 10px;
+}
+
+.compare-button:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+.compare-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Price Table */
+.price-table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.price-table th, .price-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.price-table th {
+  background: #f3f4f6;
+  color: black;
+}
+
+.price-table td {
+  background: #ffffff;
+}
+
+.no-data {
+  color: red;
+  margin-top: 15px;
+}
