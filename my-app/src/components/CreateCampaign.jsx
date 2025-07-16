@@ -46,7 +46,7 @@ const CreateCampaign = ({ user }) => {
   };
 
   const API_URL = "http://localhost:5000";
-  const HF_API_KEY = "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";
+  const HF_API_KEY = "API_KEY";
   const MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3";
   const HF_API_URL = `https://api-inference.huggingface.co/models/${MODEL_NAME}`;
 
