@@ -4,9 +4,7 @@
 
 
 <p align="center">
-  <a href="https://v1.pinimg.com/videos/mc/720p/6f/ae/06/6fae062657f4335cdf5372b34f06e61b.mp4" target="_blank">
-    <img src="https://i.imgur.com/0y8Ftya.png" alt="AdGenius Video Preview" width="500"/>
-  </a>
+  <img src="https://img.freepik.com/free-vector/mobile-marketing-isometric-style_23-2148896785.jpg?t=st=1752748834~exp=1752752434~hmac=1f4993c49c80c8a5c49cc4309f91104be3b0d1e371d77da21a705aff93cbd70e&w=1480" alt="AdGenius Mobile Marketing Illustration" width="500"/>
 </p>
 
 ---
